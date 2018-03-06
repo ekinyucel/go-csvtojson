@@ -1,2 +1,5 @@
 go-csvtojson.exe
+go-csvtojson.json
 flights2.csv
+.vscode/
+debug
