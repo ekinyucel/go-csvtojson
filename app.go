@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -28,7 +28,7 @@ func main() {
 		headers = append(headers, head) // get the header values
 	}
 
-	content = content[1:]
+	content = content[1:] // slice the array in order to remove the header row as we already assigned it to the headers array.
 
 	var buffer bytes.Buffer
 	buffer.WriteString(string("["))
@@ -37,7 +37,7 @@ func main() {
 		buffer.WriteString(string("{"))
 
 		for x, y := range d {
-			if x < len(headers)-1 {
+			if x < len(headers)-1 { // check if we are in the limits of headers array when the iteration happens.
 				buffer.WriteString(`"` + headers[x] + `":`)
 				_, err := strconv.ParseFloat(y, 32)
 				_, err2 := strconv.ParseBool(y)
@@ -49,7 +49,7 @@ func main() {
 					buffer.WriteString((`"` + y + `"`))
 				}
 
-				if x < len(d)-1 {
+				if x < len(d)-4 { // i wrote len(d) in order to avoid extra comma after the last field. it had an issue with extra comma at the end
 					buffer.WriteString(string(","))
 				}
 			}
@@ -62,13 +62,10 @@ func main() {
 	}
 
 	buffer.WriteString(string("]"))
-	//raw := json.RawMessage(buffer.String())
-	output, _ := json.MarshalIndent(buffer, "", " ")
-	//fmt.Println(raw)
+	//output, _ := json.MarshalIndent(buffer, "", " ")
 	fmt.Println(&buffer)
-	fmt.Println(output)
 
-	path := "C:/Users/eyucel/go/src/go-csvtojson/"
+	path := GetPath() + "\\go-csvtojson" // temporary solution
 
 	newFileName := filepath.Base(path)
 	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
@@ -83,6 +80,15 @@ func SaveFile(myFile *bytes.Buffer, path string) {
 	if err := ioutil.WriteFile(path, myFile.Bytes(), os.FileMode(0644)); err != nil {
 		panic(err)
 	}
+}
+
+// GetPath return dir path
+func GetPath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir
 }
 
 func check(e error) {
