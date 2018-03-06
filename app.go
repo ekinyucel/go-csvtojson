@@ -78,19 +78,12 @@ func main() {
 	SaveFile(&buffer, filePath)
 }
 
+// SaveFile write output buffer to a file
 func SaveFile(myFile *bytes.Buffer, path string) {
 	if err := ioutil.WriteFile(path, myFile.Bytes(), os.FileMode(0644)); err != nil {
 		panic(err)
 	}
 }
-
-/*func GetCurrentPath() *string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return dir
-}*/
 
 func check(e error) {
 	if e != nil {
