@@ -15,15 +15,7 @@ import (
 func main() {
 	csvpath := flag.String("path", "./flights.csv", "File path")
 	flag.Parse()
-	f, err := os.Open(*csvpath) // automatic file upload will be added.
-	check(err)
-	defer f.Close()
-
-	reader := csv.NewReader(f)
-	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
-	content, err := reader.ReadAll()
-
-	check(err)
+	content := ReadCSV(csvpath)
 
 	headers := make([]string, 0)
 	for _, head := range content[0] {
@@ -75,6 +67,20 @@ func main() {
 	filePath := filepath.Join(r, newFileName)
 
 	SaveFile(&buffer, filePath)
+}
+
+// ReadCSV read csv file and prepare for parsing
+func ReadCSV(csvpath *string) [][]string {
+	f, err := os.Open(*csvpath) // automatic file upload will be added.
+	check(err)
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
+	content, err := reader.ReadAll()
+	check(err)
+
+	return content
 }
 
 // SaveFile write output buffer to a file
