@@ -13,8 +13,10 @@ import (
 )
 
 func main() {
+	// get input from the CLI
 	csvpath := flag.String("path", "./flights.csv", "File path")
 	flag.Parse()
+
 	content := ReadCSV(csvpath)
 
 	headers := make([]string, 0)
@@ -25,6 +27,39 @@ func main() {
 	content = content[1:] // slice the array in order to remove the header row as we already assigned it to the headers array.
 
 	var buffer bytes.Buffer
+	buffer = ConvertJSON(headers, content)
+
+	//output, _ := json.MarshalIndent(buffer, "", " ") // for test cases
+	//fmt.Println(&buffer) // for test cases
+
+	path := GetPath() + "\\go-csvtojson" // temporary solution
+
+	newFileName := filepath.Base(path)
+	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
+	r := filepath.Dir(path)
+	filePath := filepath.Join(r, newFileName)
+
+	SaveFile(&buffer, filePath)
+}
+
+// ReadCSV read csv file and prepare for parsing
+func ReadCSV(csvpath *string) [][]string {
+	f, err := os.Open(*csvpath) // automatic file upload will be added.
+	check(err)
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
+	content, err := reader.ReadAll()
+	check(err)
+
+	return content
+}
+
+// ConvertJSON convert it to json
+func ConvertJSON(headers []string, content [][]string) bytes.Buffer {
+	var buffer bytes.Buffer
+
 	buffer.WriteString(string("["))
 
 	for i, d := range content {
@@ -56,31 +91,7 @@ func main() {
 	}
 
 	buffer.WriteString(string("]"))
-	//output, _ := json.MarshalIndent(buffer, "", " ") // for test cases
-	//fmt.Println(&buffer) // for test cases
-
-	path := GetPath() + "\\go-csvtojson" // temporary solution
-
-	newFileName := filepath.Base(path)
-	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
-	r := filepath.Dir(path)
-	filePath := filepath.Join(r, newFileName)
-
-	SaveFile(&buffer, filePath)
-}
-
-// ReadCSV read csv file and prepare for parsing
-func ReadCSV(csvpath *string) [][]string {
-	f, err := os.Open(*csvpath) // automatic file upload will be added.
-	check(err)
-	defer f.Close()
-
-	reader := csv.NewReader(f)
-	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
-	content, err := reader.ReadAll()
-	check(err)
-
-	return content
+	return buffer
 }
 
 // SaveFile write output buffer to a file
