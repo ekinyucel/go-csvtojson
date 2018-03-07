@@ -29,9 +29,6 @@ func main() {
 	var buffer bytes.Buffer
 	buffer = ConvertJSON(headers, content)
 
-	//output, _ := json.MarshalIndent(buffer, "", " ") // for test cases
-	//fmt.Println(&buffer) // for test cases
-
 	path := GetPath() + "\\go-csvtojson" // temporary solution
 
 	newFileName := filepath.Base(path)
