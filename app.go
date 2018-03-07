@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,7 +13,9 @@ import (
 )
 
 func main() {
-	f, err := os.Open("./flights2.csv")
+	csvpath := flag.String("path", "./flights.csv", "File path")
+	flag.Parse()
+	f, err := os.Open(*csvpath) // automatic file upload will be added.
 	check(err)
 	defer f.Close()
 
@@ -49,7 +51,7 @@ func main() {
 					buffer.WriteString((`"` + y + `"`))
 				}
 
-				if x < len(d)-4 { // i wrote len(d) in order to avoid extra comma after the last field. it had an issue with extra comma at the end
+				if x < len(d)-4 { // I wrote len(d)-4 in order to avoid extra comma after the last field. it had an issue with extra comma at the end
 					buffer.WriteString(string(","))
 				}
 			}
@@ -62,8 +64,8 @@ func main() {
 	}
 
 	buffer.WriteString(string("]"))
-	//output, _ := json.MarshalIndent(buffer, "", " ")
-	fmt.Println(&buffer)
+	//output, _ := json.MarshalIndent(buffer, "", " ") // for test cases
+	//fmt.Println(&buffer) // for test cases
 
 	path := GetPath() + "\\go-csvtojson" // temporary solution
 
