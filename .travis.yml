@@ -1,0 +1,10 @@
+language: go
+go:
+  - "1.10"
+
+# only commit the most recent commit
+git:
+  depth: 1
+
+script:
+  - go build
