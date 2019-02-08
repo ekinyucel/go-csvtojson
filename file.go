@@ -5,14 +5,39 @@ import (
 	"encoding/csv"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var splitDelimiter = "."
 
 // File struct contains file operations
 type File struct {
+}
+
+func processFile(file *string, done chan bool) {
+	defer wg.Done()
+	content := readCSV(file)
+
+	headers := make([]string, 0)
+	for _, head := range content[0] {
+		headers = append(headers, head) // get the header values
+	}
+	content = content[1:] // slice the array in order to remove the header row as we already assigned it to the headers array.
+
+	var buffer bytes.Buffer
+	buffer = convertJSON(headers, content)
+
+	path := GetPath() + "\\go-csvtojson" // temporary solution
+
+	newFileName := *file + strconv.FormatInt(time.Now().Unix(), 10)
+	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
+	r := filepath.Dir(path)
+	filePath := filepath.Join(r, newFileName)
+
+	saveFile(&buffer, filePath)
 }
 
 func getInputFileFormat(fileName os.FileInfo, formatType string) bool {

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -15,29 +13,6 @@ import (
 var logger = log.New(os.Stdout, "converter: ", log.LstdFlags)
 var fileList []string
 var wg sync.WaitGroup
-
-func processFile(file *string, done chan bool) {
-	defer wg.Done()
-	content := readCSV(file)
-
-	headers := make([]string, 0)
-	for _, head := range content[0] {
-		headers = append(headers, head) // get the header values
-	}
-	content = content[1:] // slice the array in order to remove the header row as we already assigned it to the headers array.
-
-	var buffer bytes.Buffer
-	buffer = convertJSON(headers, content)
-
-	path := GetPath() + "\\go-csvtojson" // temporary solution
-
-	newFileName := *file + strconv.FormatInt(time.Now().Unix(), 10)
-	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
-	r := filepath.Dir(path)
-	filePath := filepath.Join(r, newFileName)
-
-	saveFile(&buffer, filePath)
-}
 
 func main() {
 	startTime := time.Now()
