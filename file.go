@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,13 +15,28 @@ import (
 
 var splitDelimiter = "."
 
-// File struct contains file operations
+// File struct contains
 type File struct {
+	filename  string
+	processed bool
 }
 
-func processFile(file *string, done chan bool) {
-	defer wg.Done()
-	content := readCSV(file)
+// todo find a better way to search through the slice
+func isFileProcessed(list *[]File, filename string) bool {
+	for _, f := range *list {
+		if f.filename == filename {
+			return f.processed
+		}
+	}
+	return false
+}
+
+func processFile(file *File) {
+	startTime := time.Now()
+	filename := file.filename
+
+	//defer wg.Done()
+	content := readCSV(&filename)
 
 	headers := make([]string, 0)
 	for _, head := range content[0] {
@@ -30,14 +47,18 @@ func processFile(file *string, done chan bool) {
 	var buffer bytes.Buffer
 	buffer = convertJSON(headers, content)
 
-	path := GetPath() + "\\go-csvtojson" // temporary solution
+	path := getPath() + "\\go-csvtojson" // temporary solution
 
-	newFileName := *file + strconv.FormatInt(time.Now().Unix(), 10)
+	newFileName := filename + strconv.FormatInt(time.Now().Unix(), 10)
 	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
 	r := filepath.Dir(path)
 	filePath := filepath.Join(r, newFileName)
 
 	saveFile(&buffer, filePath)
+
+	file.processed = true
+	endTime := time.Now()
+	fmt.Println(endTime.Sub(startTime))
 }
 
 func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
@@ -110,4 +131,12 @@ func saveFile(myFile *bytes.Buffer, path string) {
 	if err := ioutil.WriteFile(path, myFile.Bytes(), os.FileMode(0644)); err != nil {
 		panic(err)
 	}
+}
+
+func getPath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir
 }
