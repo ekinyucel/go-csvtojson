@@ -30,7 +30,7 @@ func fileChanges(c chan []File) {
 	}
 
 	for _, file := range files {
-		if getInputFileFormat(file, fileType) {
+		if getInputFileFormat(file, fileType) && !isFileProcessed(&fileList, file.Name()) {
 			fileList = append(fileList, File{filename: file.Name(), processed: false})
 		}
 	}
