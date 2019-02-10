@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -19,22 +18,8 @@ func observeDirectory(c chan []File) {
 	logger.Println("observing directory")
 
 	cron := cron.New()
-	cron.AddFunc("0 * * * *", func() { fileChanges(c) })
+	cron.AddFunc("0 * * * *", func() { trackFiles(c) })
 	cron.Start()
-}
-
-func fileChanges(c chan []File) {
-	files, err := ioutil.ReadDir(".")
-	if err != nil {
-		panic(err)
-	}
-
-	for _, file := range files {
-		if getInputFileFormat(file, fileType) && !isFileProcessed(&fileList, file.Name()) {
-			fileList = append(fileList, File{filename: file.Name(), processed: false})
-		}
-	}
-	c <- fileList
 }
 
 func main() {

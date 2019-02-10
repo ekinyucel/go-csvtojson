@@ -21,6 +21,20 @@ type File struct {
 	processed bool
 }
 
+func trackFiles(c chan []File) {
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		if getInputFileFormat(file, fileType) && !isFileProcessed(&fileList, file.Name()) {
+			fileList = append(fileList, File{filename: file.Name(), processed: false})
+		}
+	}
+	c <- fileList
+}
+
 // todo find a better way to search through the slice
 func isFileProcessed(list *[]File, filename string) bool {
 	for _, f := range *list {
