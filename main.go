@@ -10,7 +10,7 @@ import (
 	"github.com/robfig/cron"
 )
 
-var logger = log.New(os.Stdout, "converter: ", log.LstdFlags)
+var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
 var fileChannel = make(chan []File)
 var fileType = "csv"

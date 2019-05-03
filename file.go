@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -22,7 +21,7 @@ type File struct {
 func trackFiles() {
 	files, err := ioutil.ReadDir(".")
 	if err != nil {
-		panic(err)
+		logger.Printf("Error: %s", err.Error())
 	}
 
 	for _, file := range files {
@@ -89,7 +88,7 @@ func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
 func readCSV(csvpath *string) [][]string {
 	f, err := os.Open("./" + *csvpath) // automatic file upload will be added.
 	if err != nil {
-		panic(err)
+		logger.Printf("Error: %s", err.Error())
 	}
 	defer f.Close()
 
@@ -98,7 +97,7 @@ func readCSV(csvpath *string) [][]string {
 	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
 	content, err := reader.ReadAll()
 	if err != nil {
-		panic(err)
+		logger.Printf("Error: %s", err.Error())
 	}
 
 	return content
@@ -143,14 +142,14 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 
 func saveFile(myFile *bytes.Buffer, path string) {
 	if err := ioutil.WriteFile(path, myFile.Bytes(), os.FileMode(0644)); err != nil {
-		panic(err)
+		logger.Printf("Error: %s", err.Error())
 	}
 }
 
 func getPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		log.Fatal(err)
+		logger.Printf("Error: %s", err.Error())
 	}
 	return dir
 }
