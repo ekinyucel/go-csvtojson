@@ -30,6 +30,7 @@ func trackFiles() {
 			fileList = append(fileList, File{filename: file.Name(), processed: false})
 		}
 	}
+
 	fileChannel <- fileList
 }
 

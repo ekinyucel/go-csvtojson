@@ -25,8 +25,9 @@ func observeDirectory() {
 		go trackFiles()
 		go func() {
 			for i := range <-fileChannel {
-				logger.Println("index i ", i)
-				go processFile(&fileList[i])
+				if !fileList[i].processed {
+					go processFile(&fileList[i])
+				}
 			}
 		}()
 	})
