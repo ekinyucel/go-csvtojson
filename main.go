@@ -12,27 +12,32 @@ import (
 
 var logger = log.New(os.Stdout, "converter: ", log.LstdFlags)
 var fileList []File
+var fileChannel = make(chan []File)
 var fileType = "csv"
 
-func observeDirectory(c chan []File) {
+//var fileChan = make(chan []File)
+
+func observeDirectory() {
 	logger.Println("observing directory")
 
 	cron := cron.New()
-	cron.AddFunc("0 * * * *", func() { trackFiles(c) })
+	cron.AddFunc("0 * * * *", func() {
+		go trackFiles()
+		go func() {
+			for i := range <-fileChannel {
+				logger.Println("index i ", i)
+				go processFile(&fileList[i])
+			}
+		}()
+	})
 	cron.Start()
 }
 
 func main() {
-	fileChan := make(chan []File)
+	// fileChan := make(chan []File)
 
-	go observeDirectory(fileChan)
+	go observeDirectory()
 	ctx := shutdown(context.Background())
-
-	go func() {
-		for i := range <-fileChan {
-			go processFile(&fileList[i])
-		}
-	}()
 
 	<-ctx.Done()
 	for i := range fileList {

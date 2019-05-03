@@ -13,15 +13,13 @@ import (
 	"time"
 )
 
-var splitDelimiter = "."
-
 // File struct contains
 type File struct {
 	filename  string
 	processed bool
 }
 
-func trackFiles(c chan []File) {
+func trackFiles() {
 	files, err := ioutil.ReadDir(".")
 	if err != nil {
 		panic(err)
@@ -32,7 +30,7 @@ func trackFiles(c chan []File) {
 			fileList = append(fileList, File{filename: file.Name(), processed: false})
 		}
 	}
-	c <- fileList
+	fileChannel <- fileList
 }
 
 // todo find a better way to search through the slice
@@ -80,7 +78,7 @@ func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
 		return false
 	}
 	name := fileName.Name()
-	fileFormat := strings.Join(strings.Split(name, splitDelimiter)[1:], splitDelimiter)
+	fileFormat := strings.Join(strings.Split(name, ".")[1:], ".")
 	if fileFormat == formatType {
 		return true
 	}
@@ -95,6 +93,7 @@ func readCSV(csvpath *string) [][]string {
 	defer f.Close()
 
 	reader := csv.NewReader(f)
+	reader.Comma = ';'
 	reader.FieldsPerRecord = -1 // to avoid fieldcheckerror
 	content, err := reader.ReadAll()
 	if err != nil {
@@ -118,14 +117,14 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 				_, err := strconv.ParseFloat(y, 32)
 				_, err2 := strconv.ParseBool(y)
 				if err == nil {
-					buffer.WriteString(y)
+					buffer.WriteString((`"` + y + `"`))
 				} else if err2 == nil {
-					buffer.WriteString(strings.ToLower(y))
+					buffer.WriteString((`"` + strings.ToLower(y) + `"`))
 				} else {
 					buffer.WriteString((`"` + y + `"`))
 				}
 
-				if x < len(d)-4 { // I wrote len(d)-4 in order to avoid extra comma after the last field. it had an issue with extra comma at the end
+				if x < len(d)-2 { // I wrote len(d)-4 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
 					buffer.WriteString(string(","))
 				}
 			}
