@@ -19,7 +19,7 @@ type File struct {
 }
 
 func trackFiles() {
-	files, err := ioutil.ReadDir(".")
+	files, err := ioutil.ReadDir(folderName)
 	if err != nil {
 		logger.Printf("Error: %s", err.Error())
 	}
@@ -58,13 +58,13 @@ func processFile(file *File) {
 
 	var buffer bytes.Buffer
 	buffer = convertJSON(headers, content)
-
-	path := getPath() + "\\go-csvtojson" // temporary solution
+	//path := getPath() + "\\go-csvtojson" // temporary solution
 
 	newFileName := filename + strconv.FormatInt(time.Now().Unix(), 10)
 	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
-	r := filepath.Dir(path)
+	r := filepath.Dir(folderName)
 	filePath := filepath.Join(r, newFileName)
+	logger.Println("filepath ", filePath)
 
 	saveFile(&buffer, filePath)
 

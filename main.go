@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -14,11 +15,14 @@ var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
 var fileChannel = make(chan []File)
 var fileType = "csv"
+var folderName string
 
 //var fileChan = make(chan []File)
 
 func observeDirectory() {
-	logger.Println("observing directory")
+	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
+	flag.Parse()
+	logger.Printf("observing this directory %s", folderName)
 
 	cron := cron.New()
 	cron.AddFunc("0 * * * *", func() {
