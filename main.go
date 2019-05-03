@@ -17,8 +17,6 @@ var fileChannel = make(chan []File)
 var fileType = "csv"
 var folderName string
 
-//var fileChan = make(chan []File)
-
 func observeDirectory() {
 	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
 	flag.Parse()
@@ -39,8 +37,6 @@ func observeDirectory() {
 }
 
 func main() {
-	// fileChan := make(chan []File)
-
 	go observeDirectory()
 	ctx := shutdown(context.Background())
 
@@ -51,27 +47,19 @@ func main() {
 }
 
 func shutdown(ctx context.Context) context.Context {
-	ctx, done := context.WithCancel(ctx) // creating a context to handle graceful shutdown, cancelling requests
+	ctx, done := context.WithCancel(ctx)
 
-	quit := make(chan os.Signal, 1)                      // quit channel
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM) // when pressing CTRL+C, it passes value to quit channel
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		defer done() // deferring the call done until the end of this function
+		defer done()
 
-		<-quit // start executing the shutdown logic
+		<-quit
 		signal.Stop(quit)
-		close(quit) // closing the quit channel. it means that no more value will be sent through this channel
+		close(quit)
 
-		logger.Printf("Application is shutting down \n")
-
-		// it is not a server yet, so this block is omitted
-		/*ctx, cancel := context.WithTimeout(ctx, 10*time.Second) // setting a deadline on requests to backend server
-		defer cancel()
-
-		if err := server.Shutdown(ctx); err != nil {
-			logger.Fatalf("Could not gracefully shutdown the application: %s\n", err)
-		}*/
+		logger.Println("Application is shutting down")
 	}()
 
 	return ctx

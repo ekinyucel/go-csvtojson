@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -47,7 +46,6 @@ func processFile(file *File) {
 	startTime := time.Now()
 	filename := file.filename
 
-	//defer wg.Done()
 	content := readCSV(&filename)
 
 	headers := make([]string, 0)
@@ -58,19 +56,17 @@ func processFile(file *File) {
 
 	var buffer bytes.Buffer
 	buffer = convertJSON(headers, content)
-	//path := getPath() + "\\go-csvtojson" // temporary solution
 
 	newFileName := filename + strconv.FormatInt(time.Now().Unix(), 10)
 	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
 	r := filepath.Dir(folderName)
 	filePath := filepath.Join(r, newFileName)
-	logger.Println("filepath ", filePath)
 
 	saveFile(&buffer, filePath)
 
 	file.processed = true
 	endTime := time.Now()
-	fmt.Println(endTime.Sub(startTime))
+	logger.Printf("file processed in %d", endTime.Sub(startTime))
 }
 
 func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
