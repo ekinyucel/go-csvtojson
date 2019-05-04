@@ -46,11 +46,13 @@ func processFile(file *File) {
 	startTime := time.Now()
 	filename := file.filename
 
+	logger.Println("file name ", filename)
+
 	content := readCSV(&filename)
 
-	headers := make([]string, 0)
-	for _, head := range content[0] {
-		headers = append(headers, head) // get the header values
+	headers := make([]string, len(content[0]))
+	for i, head := range content[0] {
+		headers[i] = head // get the header values
 	}
 	content = content[1:] // slice the array in order to remove the header row as we already assigned it to the headers array.
 
@@ -82,7 +84,7 @@ func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
 }
 
 func readCSV(csvpath *string) [][]string {
-	f, err := os.Open("./" + *csvpath) // automatic file upload will be added.
+	f, err := os.Open(folderName + *csvpath) // automatic file upload will be added.
 	if err != nil {
 		logger.Printf("Error: %s", err.Error())
 	}
