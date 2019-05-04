@@ -9,7 +9,7 @@ CSV files should be added to the given directory. The folder path should be pass
 ```
 $ go build -o converter.exe
 
-$ converter.exe -folder=C:\Users\ekin\Desktop\test\
+$ converter.exe -folder=C:\Users\ekin\Desktop\test\ -filetype=csv -targetType=json
 ```
 
 For now the applications tracks the folder each minute for csv files. After that it converts csv files to json formatted ones.

@@ -58,7 +58,7 @@ func processFile(file *File) {
 	buffer = convertJSON(headers, content)
 
 	newFileName := filename + strconv.FormatInt(time.Now().Unix(), 10)
-	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + ".json"
+	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + "." + targetType
 	r := filepath.Dir(folderName)
 	filePath := filepath.Join(r, newFileName)
 
@@ -66,7 +66,7 @@ func processFile(file *File) {
 
 	file.processed = true
 	endTime := time.Now()
-	logger.Printf("file processed in %d", endTime.Sub(startTime))
+	logger.Println("file processed in ", endTime.Sub(startTime))
 }
 
 func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
