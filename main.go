@@ -14,10 +14,13 @@ import (
 var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
 var fileChannel = make(chan []File)
-var fileType = "csv"
+var fileType string
+var targetType string
 var folderName string
 
 func observeDirectory() {
+	flag.StringVar(&fileType, "filetype", "csv", "input file format")
+	flag.StringVar(&targetType, "targetType", "json", "target file format")
 	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
 	flag.Parse()
 	logger.Printf("observing this directory %s", folderName)
@@ -41,9 +44,6 @@ func main() {
 	ctx := shutdown(context.Background())
 
 	<-ctx.Done()
-	for i := range fileList {
-		logger.Println("after stopping the app ", &fileList[i])
-	}
 }
 
 func shutdown(ctx context.Context) context.Context {
