@@ -46,8 +46,6 @@ func processFile(file *File) {
 	startTime := time.Now()
 	filename := file.filename
 
-	logger.Println("file name ", filename)
-
 	content := readCSV(&filename)
 
 	headers := make([]string, len(content[0]))
@@ -122,7 +120,7 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 					buffer.WriteString((`"` + y + `"`))
 				}
 
-				if x < len(d)-2 { // I wrote len(d)-4 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
+				if x < len(d)-2 { // I wrote len(d)-2 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
 					buffer.WriteString(string(","))
 				}
 			}

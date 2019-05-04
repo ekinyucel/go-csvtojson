@@ -19,29 +19,31 @@ var targetType string
 var folderName string
 
 func observeDirectory() {
-	flag.StringVar(&fileType, "filetype", "csv", "input file format")
-	flag.StringVar(&targetType, "targetType", "json", "target file format")
-	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
-	flag.Parse()
 	logger.Printf("observing this directory %s", folderName)
 
 	cron := cron.New()
 	cron.AddFunc("0 * * * *", func() {
 		go trackFiles()
-		go func() {
-			for i := range <-fileChannel {
-				logger.Println("i ", i)
-				if !fileList[i].processed {
-					go processFile(&fileList[i])
-				}
-			}
-		}()
 	})
 	cron.Start()
 }
 
 func main() {
+	flag.StringVar(&fileType, "filetype", "csv", "input file format")
+	flag.StringVar(&targetType, "targetType", "json", "target file format")
+	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
+	flag.Parse()
+
 	go observeDirectory()
+
+	go func() {
+		for i := range <-fileChannel {
+			if !fileList[i].processed {
+				go processFile(&fileList[i])
+			}
+		}
+	}()
+
 	ctx := shutdown(context.Background())
 
 	<-ctx.Done()
