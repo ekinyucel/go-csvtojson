@@ -12,15 +12,15 @@ import (
 )
 
 const (
-	// CSV type indicates file format
+	// CSV type indicates the file format
 	CSV string = "csv"
-	// JSON type indicates file format
+	// JSON type indicates the file format
 	JSON string = "json"
 )
 
 var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
-var fileChannel = make(chan []File)
+var fileChannel = make(chan []File, 100)
 var fileType string
 var targetType string
 var folderName string
@@ -44,9 +44,14 @@ func main() {
 	go observeDirectory()
 
 	go func() {
-		for i := range <-fileChannel {
-			if !fileList[i].processed {
-				go processFile(&fileList[i])
+		for {
+			select {
+			case fileList := <-fileChannel:
+				for i := range fileList {
+					if !fileList[i].processed {
+						go processFile(&fileList[i])
+					}
+				}
 			}
 		}
 	}()
