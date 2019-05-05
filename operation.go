@@ -30,6 +30,16 @@ func processFile(file *File) {
 	startTime := time.Now()
 	filename := file.filename
 
+	if fileType == CSV {
+		processCSV(filename)
+	}
+
+	file.processed = true
+	endTime := time.Now()
+	logger.Println(filename, " processed in ", endTime.Sub(startTime))
+}
+
+func processCSV(filename string) {
 	content := readCSV(&filename)
 
 	headers := make([]string, len(content[0]))
@@ -46,11 +56,9 @@ func processFile(file *File) {
 	r := filepath.Dir(folderName)
 	filePath := filepath.Join(r, newFileName)
 
-	saveFile(&buffer, filePath)
-
-	file.processed = true
-	endTime := time.Now()
-	logger.Println("file processed in ", endTime.Sub(startTime))
+	if err := saveFile(&buffer, filePath); err != nil {
+		logger.Printf("error: %v", err)
+	}
 }
 
 func readCSV(csvpath *string) [][]string {

@@ -36,10 +36,11 @@ func getInputFileFormat(fileName os.FileInfo, formatType string) bool {
 	return false
 }
 
-func saveFile(myFile *bytes.Buffer, path string) {
+func saveFile(myFile *bytes.Buffer, path string) error {
 	if err := ioutil.WriteFile(path, myFile.Bytes(), os.FileMode(0644)); err != nil {
-		logger.Printf("Error: %s", err.Error())
+		return err
 	}
+	return nil
 }
 
 func getPath() string {

@@ -11,6 +11,13 @@ import (
 	"github.com/robfig/cron"
 )
 
+const (
+	// CSV type indicates file format
+	CSV string = "csv"
+	// JSON type indicates file format
+	JSON string = "json"
+)
+
 var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
 var fileChannel = make(chan []File)
@@ -29,8 +36,8 @@ func observeDirectory() {
 }
 
 func main() {
-	flag.StringVar(&fileType, "filetype", "csv", "input file format")
-	flag.StringVar(&targetType, "targetType", "json", "target file format")
+	flag.StringVar(&fileType, "filetype", CSV, "input file format")
+	flag.StringVar(&targetType, "targetType", JSON, "target file format")
 	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
 	flag.Parse()
 
