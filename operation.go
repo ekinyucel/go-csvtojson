@@ -89,19 +89,21 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 
 		for x, y := range d {
 			if x < len(headers)-1 { // check if we are in the limits of headers array when the iteration happens.
-				buffer.WriteString(`"` + headers[x] + `":`)
-				_, err := strconv.ParseFloat(y, 32)
-				_, err2 := strconv.ParseBool(y)
-				if err == nil {
-					buffer.WriteString((`"` + y + `"`))
-				} else if err2 == nil {
-					buffer.WriteString((`"` + strings.ToLower(y) + `"`))
-				} else {
-					buffer.WriteString((`"` + y + `"`))
-				}
+				if headers[x] != "   " {
+					buffer.WriteString(`"` + headers[x] + `":`)
+					_, err := strconv.ParseFloat(y, 32)
+					_, err2 := strconv.ParseBool(y)
+					if err == nil {
+						buffer.WriteString((`"` + y + `"`))
+					} else if err2 == nil {
+						buffer.WriteString((`"` + strings.ToLower(y) + `"`))
+					} else {
+						buffer.WriteString((`"` + y + `"`))
+					}
 
-				if x < len(d)-2 { // I wrote len(d)-2 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
-					buffer.WriteString(string(","))
+					if x < len(d)-2 { // I wrote len(d)-2 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
+						buffer.WriteString(string(","))
+					}
 				}
 			}
 		}

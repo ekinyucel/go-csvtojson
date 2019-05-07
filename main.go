@@ -4,11 +4,13 @@ import (
 	"context"
 	"flag"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"github.com/robfig/cron"
+	_ "net/http/pprof"
 )
 
 const (
@@ -20,7 +22,7 @@ const (
 
 var logger = log.New(os.Stdout, "main: ", log.LstdFlags)
 var fileList []File
-var fileChannel = make(chan []File, 100)
+var fileChannel = make(chan []File)
 var fileType string
 var targetType string
 var folderName string
@@ -28,11 +30,17 @@ var folderName string
 func observeDirectory() {
 	logger.Printf("observing this directory %s", folderName)
 
-	cron := cron.New()
+	tick := time.Tick(1000 * time.Millisecond)
+
+	for range tick {
+		go trackFiles()
+	}
+
+	/*cron := cron.New()
 	cron.AddFunc("0 * * * *", func() {
 		go trackFiles()
 	})
-	cron.Start()
+	cron.Start()*/
 }
 
 func main() {
@@ -40,6 +48,12 @@ func main() {
 	flag.StringVar(&targetType, "targetType", JSON, "target file format")
 	flag.StringVar(&folderName, "folder", "C:\\Users\\user\\Desktop\\", "folder name")
 	flag.Parse()
+
+	// for profiling
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+	// for profiling
 
 	go observeDirectory()
 
@@ -49,7 +63,7 @@ func main() {
 			case fileList := <-fileChannel:
 				for i := range fileList {
 					if !fileList[i].processed {
-						go processFile(&fileList[i])
+						processFile(&fileList[i]) // decide whether using go keyword here or not
 					}
 				}
 			}
