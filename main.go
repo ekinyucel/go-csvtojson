@@ -35,12 +35,6 @@ func observeDirectory() {
 	for range tick {
 		go trackFiles()
 	}
-
-	/*cron := cron.New()
-	cron.AddFunc("0 * * * *", func() {
-		go trackFiles()
-	})
-	cron.Start()*/
 }
 
 func main() {
@@ -63,7 +57,7 @@ func main() {
 			case fileList := <-fileChannel:
 				for i := range fileList {
 					if !fileList[i].processed {
-						go processFile(&fileList[i]) // decide whether using go keyword here or not
+						go processFile(&fileList[i])
 					}
 				}
 			}
