@@ -51,6 +51,8 @@ func processCSV(filename string) {
 	var buffer bytes.Buffer
 	buffer = convertJSON(headers, content)
 
+	logger.Println("is json ", isJSON(buffer.Bytes()))
+
 	newFileName := filename + strconv.FormatInt(time.Now().Unix(), 10)
 	newFileName = newFileName[0:len(newFileName)-len(filepath.Ext(newFileName))] + "." + targetType
 	r := filepath.Dir(folderName)
@@ -89,16 +91,16 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 
 		for x, y := range d {
 			if x < len(headers)-1 { // check if we are in the limits of headers array when the iteration happens.
-				if headers[x] != "   " {
+				if headers[x] != "   " { // if the header is empty, then discard the entire column
 					buffer.WriteString(`"` + headers[x] + `":`)
 					_, err := strconv.ParseFloat(y, 32)
 					_, err2 := strconv.ParseBool(y)
 					if err == nil {
-						buffer.WriteString((`"` + y + `"`))
+						buffer.WriteString((`"` + strings.TrimSpace(y) + `"`))
 					} else if err2 == nil {
-						buffer.WriteString((`"` + strings.ToLower(y) + `"`))
+						buffer.WriteString((`"` + strings.TrimSpace(strings.ToLower(y)) + `"`))
 					} else {
-						buffer.WriteString((`"` + y + `"`))
+						buffer.WriteString((`"` + strings.TrimSpace(y) + `"`))
 					}
 
 					if x < len(d)-2 { // I wrote len(d)-2 in order to avoid extra comma after the last field. it had an issue with extra comma in the end

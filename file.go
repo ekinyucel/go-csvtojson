@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -49,4 +50,9 @@ func getPath() string {
 		logger.Printf("Error: %s", err.Error())
 	}
 	return dir
+}
+
+func isJSON(str []byte) bool {
+	var js json.RawMessage
+	return json.Unmarshal(str, &js) == nil
 }

@@ -63,7 +63,7 @@ func main() {
 			case fileList := <-fileChannel:
 				for i := range fileList {
 					if !fileList[i].processed {
-						processFile(&fileList[i]) // decide whether using go keyword here or not
+						go processFile(&fileList[i]) // decide whether using go keyword here or not
 					}
 				}
 			}
