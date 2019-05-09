@@ -100,7 +100,7 @@ func convertJSON(headers []string, content [][]string) bytes.Buffer {
 					} else if err2 == nil {
 						buffer.WriteString((`"` + strings.TrimSpace(strings.ToLower(y)) + `"`))
 					} else {
-						buffer.WriteString((`"` + strings.TrimSpace(y) + `"`))
+						buffer.WriteString((`"` + strings.Replace(y, "\n", "", -1) + `"`))
 					}
 
 					if x < len(d)-2 { // I wrote len(d)-2 in order to avoid extra comma after the last field. it had an issue with extra comma in the end
